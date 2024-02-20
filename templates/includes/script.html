@@ -1,0 +1,55 @@
+
+{% load static %}
+<script src="{% static 'assets/paper-dashboard/js/core/jquery.min.js' %}"></script>
+<!-- DataTables JS -->
+<script src="{% static 'assets/DataTables/DataTables-1.13.8/js/jquery.dataTables.min.js' %}"></script>
+<!-- DataTables Bootstrap JS -->
+<script src="{% static 'assets/DataTables/DataTables-1.13.8/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'assets/qrcode2.js' %}"></script>
+<script>
+$(document).ready(function(){
+    $('.custom-file-input').on('change', function(){
+        $('.thisRow2').hide();
+        $('.thisRow3').hide();
+        var files = $(this)[0].files;
+        $('#fileList').empty();
+        for(var i=0; i<files.length; i++) {
+            var fileNumber = i + 1;
+            var fileName = files[i].name;
+            var lastModifiedTimestamp = files[i].lastModified;
+            var lastModifiedDate = new Date(lastModifiedTimestamp);
+            // var fileDate = files[i].lastModifiedDate.toLocaleDateString();
+            $('#fileList').append('<tr><td>' + fileNumber + '</td><td>' + fileName + '</td><td>' + lastModifiedDate.getDate() + '/' + (lastModifiedDate.getMonth() + 1) + '/' + lastModifiedDate.getFullYear() + '&nbsp' + lastModifiedDate.getHours() + ':' + lastModifiedDate.getMinutes() + '</td></tr>');
+        }
+        $('#fileListHeader').show();
+        $('#processBtn').show();
+    });
+});
+</script>
+<script>
+$(document).ready(function(){
+     $('.myTable').DataTable({
+        lengthMenu: [5, 10, 25, 50]
+     });
+});
+</script>
+<script>
+$(document).ready(function(){
+     $('.myTable1').DataTable({
+        searching: false  // Disable search
+        info: false  // Disable info
+    });
+});
+</script>
+<script>
+$(document).ready(function(){
+    $(".generate").click(function(){
+        $(".thisRow1").hide();
+        $(".thisRow2").hide();
+        $(".thisRow3").show();
+        $(".print").show();
+        print();
+        location.reload();
+    });
+});
+</script>
