@@ -1,22 +1,15 @@
 from django.shortcuts import render, redirect
-from django.views.generic import TemplateView, View
-# from django.conf import settings
-from django.template.loader import render_to_string
+from django.views.generic import TemplateView
 
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-from django.http import HttpResponseRedirect, HttpResponse
-from django.urls import reverse
 
 import os
-import fitz  # pipenv install pymupdf
-import re
-from Crypto.Cipher import AES  # pipenv install pycryptodome
-from Crypto.Util.Padding import pad, unpad
+import fitz  # pip install pymupdf
+from Crypto.Cipher import AES  # pip install pycryptodome
+from Crypto.Util.Padding import pad
 import base64
-import qrcode  # pipenv install qrcode
-from PIL import Image  # resize image # pipenv install pillow
-import shutil
+import qrcode  # pip install qrcode
+from PIL import Image  # resize image # pip install pillow
 
 
 # Create your views here.
@@ -40,7 +33,6 @@ class GeneratePage(TemplateView):
                 with open(os.path.join(settings.MEDIA_ROOT, 'temp', file.name), 'wb+') as destination:
                     for chunk in file.chunks():
                         destination.write(chunk)
-
 
                 text_file_path = self.convert_pdf_to_text(file)
                 text_file_path_cleaned = self.remove_blank_newlines(text_file_path)
@@ -161,3 +153,114 @@ class GeneratePage(TemplateView):
 
         context['files_data'] = files_data
         return context
+
+
+class GeneratePage2(TemplateView):
+    template_name = 'generate_manual.html'
+
+    def post(self, request, *args, **kwargs):
+        files = request.POST.getlist('plainText')
+
+        # Process files if there are any
+        if files:
+            private_key = self.request.POST.get('key')
+
+            # Clear existing files in the media directory
+            self.clear_media_directory()
+
+            # Save private key
+            with open(os.path.join(settings.MEDIA_ROOT, 'key', 'private_key.txt'), 'w') as key_file:
+                key_file.write(private_key)
+
+            # Define the file path within the temporary folder
+            temp_folder_path = os.path.join(settings.MEDIA_ROOT, 'temp_2')
+
+            # Define file paths for plaintext files
+            plaintext_file_path = os.path.join(temp_folder_path, 'output_plaintext.txt')
+
+            # Save plaintext content to a file
+            with open(plaintext_file_path, 'w') as f:
+                f.write('\n'.join(files))
+
+        # Redirect back to the previous page
+        return redirect(request.META.get('HTTP_REFERER'))
+
+
+    # remove all files in the media path when the form is submitted
+    def clear_media_directory(self):
+        temp_folder_path = os.path.join(settings.MEDIA_ROOT, 'temp_2')
+        if os.path.exists(temp_folder_path) and os.path.isdir(temp_folder_path):
+            for filename in os.listdir(temp_folder_path):
+                file_path = os.path.join(temp_folder_path, filename)
+                try:
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {e}")
+        else:
+            print("Temp folder does not exist or is not a directory")
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Read the private key from private_key.txt file
+        private_key_file_path = os.path.join(settings.MEDIA_ROOT, 'key', 'private_key.txt')
+        private_key = None  # Initializing private_key
+        try:
+            with open(private_key_file_path, 'r') as key_file:
+                private_key = key_file.read().strip()
+
+            # Add private key to the context
+            context['private_key'] = private_key
+        except FileNotFoundError:
+            pass
+
+
+        if private_key:
+            # Define the temporary folder path
+            temp_folder_path = os.path.join(settings.MEDIA_ROOT, 'temp_2')
+
+            # Define file paths for plaintext and base64 encoded files
+            plaintext_file_path = os.path.join(temp_folder_path, 'output_plaintext.txt')
+            base64_file_path = os.path.join(temp_folder_path, 'output_base64.txt')
+
+            key = private_key  # secret key
+            iv = b'\0' * 16  # Default zero based bytes[16]
+            base64_encoded_lines = []
+                
+            try:
+                # Read plaintext content from file and encrypt each line
+                with open(plaintext_file_path, 'r') as f:
+                    for line in f:
+                        # Encrypt plaintext content
+                        cipher = AES.new(key.encode(), AES.MODE_CBC, iv)
+                        cipher_text = cipher.encrypt(pad(line.encode(), AES.block_size))
+
+                        # Encode encrypted content in base64 and append to the list
+                        base64_encoded_lines.append(base64.b64encode(cipher_text).decode('utf-8'))
+
+                # Concatenate encrypted lines with newline characters
+                base64_encoded = '\n'.join(base64_encoded_lines)
+
+                # Save base64 encoded content to a file
+                with open(base64_file_path, 'w') as f:
+                    f.write(base64_encoded)
+
+            
+                # Read plaintext content from file
+                with open(plaintext_file_path, 'r') as f:
+                    plaintext_data = [line.strip().split('|') for line in f.readlines()]
+                    f.seek(0)  # Reset file pointer to beginning
+                    plaintext_data_all = f.read().splitlines()
+
+                # Read plaintext content from file
+                with open(base64_file_path, 'r') as f:
+                    cipher_text_data = f.read().splitlines()
+
+                context['combined_data'] = zip(plaintext_data, plaintext_data_all, cipher_text_data)
+                context['qr_generate'] = zip(plaintext_data, cipher_text_data)
+            except OSError as e:
+                print(e.errno)
+        return context
+        

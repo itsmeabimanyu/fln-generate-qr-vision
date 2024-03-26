@@ -4,8 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # path('', views.QrGenerate.as_view(), name='QrGenerate'),
     path('', views.GeneratePage.as_view(), name='GeneratePage'),
+    path('add-manual', views.GeneratePage2.as_view(), name='GeneratePage2'),
 ]
 
 # Serve media files during development
