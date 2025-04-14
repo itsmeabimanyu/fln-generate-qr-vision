@@ -1,0 +1,215 @@
+{% extends 'layouts/base.html' %}
+{% load static custom_filters %}
+<!-- [ Main Content ] start -->
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-stats card-round">
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <h4 class="card-title">{{ card_title }}</h4>
+                        <div class="ms-auto">
+                            <div class="input-group">
+                                <input type="number" id="rowCount" class="form-control" min="1">
+                                <button class="btn btn-sm btn-secondary" type="button" id="addRows"><i class="fa fa-plus me-2"></i>Add Rows</button>
+                                {{ additionals_button|safe }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="add-row" class="table table-sm table-hover" >
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    {% for field in form %}
+                                        <th>{{ field.label }}</th>
+                                    {% endfor %}
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- ListView -->
+                                {% for item in items %}
+                                <tr>
+                                    <td class="clickable">{{ forloop.counter }}</td>
+                                    {% for field in form %}
+                                    <td>{{ item|get_field_value:field.name|safe }}</td>
+                                    {% endfor %}
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#act-{{ item.id }}">Options </button>
+                                        <div id="act-{{ item.id }}" class="collapse mt-1">
+                                            {% for value in item.buttons_action %}
+                                                {{ value|safe }}
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                <!-- End ListView -->
+
+                                <!-- Form -->
+                                <tr>
+                                    <td>{{ items|length|add:1 }}</td>
+                                    {% for field in form %}
+                                        <td>{{ field }}</td>
+                                    {% endfor %}
+                                    <td><button type="button" class="btn btn-danger btn-sm deleteRow"><i class="fa fa-trash"></i></button></td> 
+                                </tr>
+                                <!-- End Form -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-action py-4 px-4">
+                    <button type="submit" class="btn btn-secondary">Submit</button>
+                    <button type="button" class="btn btn-dark" onclick="window.history.back();">Back</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Tambahkan baris saat tombol "Add Rows" diklik
+        $('#addRows').on('click', function() {
+            // Ambil jumlah baris yang diinput
+            var rowCount = $('#rowCount').val();
+            // Jika input kosong, tambahkan 1 baris
+            if (rowCount === "") {
+                rowCount = 1;
+            }
+            // Jika input bukan angka atau 0, jangan tambahkan baris
+            else if (isNaN(rowCount) || rowCount <= 0) {
+                alert('Input tidak valid! Masukkan angka lebih dari 0.');
+                return;
+            }
+            // Loop untuk menambahkan baris sesuai jumlah yang diinput
+            for (var i = 0; i < rowCount; i++) {
+                // Hitung nomor baris
+                var currentRowCount = $('#add-row tbody tr').length + 1;
+
+                // Buat baris baru
+                var newRow = `
+                    <tr>
+                        <td>${currentRowCount}</td>
+                        {% for field in form %}
+                            <td>{{ field }}</td>
+                        {% endfor %}
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm deleteRow">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                // Tambahkan baris ke tabel
+                $('#add-row tbody').append(newRow);
+            }
+            // Reset input jumlah baris
+            $('#rowCount').val('');
+        });
+        // Hapus baris saat tombol "Delete" diklik
+        $('#add-row tbody').on('click', '.deleteRow', function() {
+            $(this).closest('tr').remove();
+
+            // Perbarui nomor baris setelah menghapus
+            $('#add-row tbody tr').each(function(index) {
+                $(this).find('td:first').text(index + 1);
+            });
+        });
+        // Ketika baris yang dapat diklik diklik
+        $('#add-row tbody').on('click', 'td.clickable', function() {
+            var td = $(this); // <td> yang diklik
+            var tr = td.closest('tr'); // <tr> yang mengandung <td> yang diklik
+            // var tr = $(this);
+            var childRow = tr.next('.child-row');
+
+            if (childRow.length) {
+                // Jika baris anak sudah ada, toggle tampilannya
+                childRow.toggle();
+            } else {
+                // Jika baris anak belum ada, buat dan tampilkan
+                var childContent = '<tr class="child-row"><td colspan="5">';
+                childContent += '<table class="table table-sm table-secondary">';
+                // Ambil data dari kolom yang disembunyikan
+                tr.find('td').each(function(index) {
+                    if (index > 0 && index < tr.find('td').length - 1) {
+                        var columnName = $('#add-row th').eq(index).text();
+                        var columnValue = $(this).text();
+                        childContent += '<tr><td class="w-25"><strong>' + columnName + '</strong></td><td>' + columnValue + '</td></tr>';
+                    }
+                });
+                childContent += '</table></td></tr>';
+                tr.after(childContent); // Tambahkan baris anak setelah baris yang diklik
+            }
+        });
+    });
+</script>
+
+<script>
+    // Fungsi untuk menambahkan koma dan memformat angka dengan desimal (cent)
+    function formatNumberWithCommas(input) {
+        let value = input.value.replace(/[^0-9\.]/g, ''); // Menghapus karakter non-numerik dan non-desimal
+        let parts = value.split('.'); // Memisahkan angka menjadi bagian integer dan desimal
+        // Memformat bagian integer dengan koma
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        // Jika ada bagian desimal, pastikan hanya dua digit setelah titik
+        if (parts[1]) {
+            parts[1] = parts[1].substring(0, 2); // Membatasi hanya dua digit desimal
+        }
+        // Gabungkan bagian integer dan desimal jika ada
+        input.value = parts.join('.');
+        // Cegah pengguna mengetik titik lebih dari satu kali setelah desimal
+        if (value.indexOf('.') !== -1 && parts[1]?.length === 2) {
+            // Menghapus titik tambahan setelah dua digit desimal
+            if (input.value.endsWith('.')) {
+                input.value = input.value.slice(0, -1);
+            }
+        }
+    }
+    // Menambahkan fungsi pada semua input dengan kelas "number-with-commas"
+    document.querySelectorAll('.number-with-commas').forEach(function(input) {
+        input.addEventListener('input', function() {
+            formatNumberWithCommas(input);
+        });
+    });
+</script>
+
+<script>
+    $('#add-row tbody').on('change', 'input', function() {
+        var row = $(this).closest('tr');
+        var allInputsCompleted = true;
+        row.find('input:not(#id_plain_text)').each(function() {
+            if ($(this).val() === '') {
+                allInputsCompleted = false;
+                return false; // Exit the loop early if any input field is empty
+            }
+        });
+        var separator = '|';
+        if (allInputsCompleted) {
+            var concatenatedValue = '';
+            row.find('input:not(#id_plain_text)').each(function(index) {
+                if (index > 0) {
+                    concatenatedValue += separator;
+                }
+                // concatenatedValue += $(this).val().replace(/,/g, ''); // Remove comma character;
+                concatenatedValue += $(this).val();
+            });
+            concatenatedValue = 'VISION' + separator + concatenatedValue; // Add "VISION" before the first separator
+            row.find('#id_plain_text').val(concatenatedValue);
+            row.find('.separator').text(separator).show();
+        } else {
+            row.find('#id_plain_text').val('');
+            row.find('.separator').text('').hide();
+        }
+    });
+</script>
+
+
+{% endblock content %}

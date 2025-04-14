@@ -1,0 +1,28 @@
+{% load static %}
+{% for item in items %}
+    {% for modal_title, modal_data in item.modals_form.items %}
+    <div class="modal fade" id="{{ modal_data.modal_id }}" tabindex="-1" role="dialog" aria-labelledby="{{ modal_data.modal_id }}Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" action="{{ modal_data.action_url }}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder" id="{{ modal_data.modal_id }}Label">{{ modal_title }}</h5>
+                        <button type="button" class="close text-light" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to {{ modal_title|lower }}?</p>
+                        {{ modal_data.info|safe }}
+                    </div>
+                    <div class="modal-footer">
+                        {{ modal_data.action_name|safe }}
+                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endfor %}

@@ -1,55 +1,73 @@
-
 {% load static %}
-<script src="{% static 'assets/paper-dashboard/js/core/jquery.min.js' %}"></script>
-<!-- DataTables JS -->
-<script src="{% static 'assets/DataTables/DataTables-1.13.8/js/jquery.dataTables.min.js' %}"></script>
-<!-- DataTables Bootstrap JS -->
-<script src="{% static 'assets/DataTables/DataTables-1.13.8/js/dataTables.bootstrap5.min.js' %}"></script>
-<script src="{% static 'assets/qrcode2.js' %}"></script>
+<!--   Core JS Files   -->
+<script src="{% static 'js/core/popper.min.js' %}"></script>
+<script src="{% static 'js/core/bootstrap.min.js' %}"></script>
+
+<!-- jQuery Scrollbar -->
+<script src="{% static 'js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
+
+<!-- Chart JS -->
+<script src="{% static 'js/plugin/chart.js/chart.min.js' %}"></script>
+
+<!-- jQuery Sparkline -->
+<script src="{% static 'js/plugin/jquery.sparkline/jquery.sparkline.min.js' %}"></script>
+
+<!-- Chart Circle -->
+<script src="{% static 'js/plugin/chart-circle/circles.min.js' %}"></script>
+
+<!-- Datatables -->
+<script src="{% static 'js/plugin/datatables/datatables.min.js' %}"></script>
+
+<!-- Bootstrap Notify -->
+<script src="{% static 'js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
+
+<!-- jQuery Vector Maps -->
+<script src="{% static 'js/plugin/jsvectormap/jsvectormap.min.js' %}"></script>
+<script src="{% static 'js/plugin/jsvectormap/world.js' %}"></script>
+
+<!-- Sweet Alert -->
+<script src="{% static 'js/plugin/sweetalert/sweetalert.min.js' %}"></script>
+
+<!-- Kaiadmin JS -->
+<script src="{% static 'js/kaiadmin.js' %}"></script>
+
+<!-- Kaiadmin DEMO methods, don't include it in your project! -->
+<script src="{% static 'js/setting-demo.js' %}"></script>
+<script src="{% static 'js/demo.js' %}"></script>
+
+<!-- preloader -->
 <script>
-$(document).ready(function(){
-    $('.custom-file-input').on('change', function(){
-        $('.thisRow2').hide();
-        $('.thisRow3').hide();
-        var files = $(this)[0].files;
-        $('#fileList').empty();
-        for(var i=0; i<files.length; i++) {
-            var fileNumber = i + 1;
-            var fileName = files[i].name;
-            var lastModifiedTimestamp = files[i].lastModified;
-            var lastModifiedDate = new Date(lastModifiedTimestamp);
-            // var fileDate = files[i].lastModifiedDate.toLocaleDateString();
-            $('#fileList').append('<tr><td>' + fileNumber + '</td><td>' + fileName + '</td><td>' + lastModifiedDate.getDate() + '/' + (lastModifiedDate.getMonth() + 1) + '/' + lastModifiedDate.getFullYear() + '&nbsp' + lastModifiedDate.getHours() + ':' + lastModifiedDate.getMinutes() + '</td></tr>');
-        }
-        $('#fileListHeader').show();
-        $('#processBtn').show();
+    window.addEventListener('load', function() {
+        // Add the 'hide' class to fade out the preloader
+        const preloader = document.getElementById('page-preloader');
+        preloader.classList.add('hide');
     });
-});
 </script>
 <script>
-$(document).ready(function(){
-    $('.myTable').DataTable({
-        lengthMenu: [5, 10, 25, 50]
+    $('#lineChart').sparkline([102,109,120,99,110,105,115], {
+        type: 'line',
+        height: '70',
+        width: '100%',
+        lineWidth: '2',
+        lineColor: '#177dff',
+        fillColor: 'rgba(23, 125, 255, 0.14)'
     });
-});
-</script>
-<script>
-$(document).ready(function(){
-    $('.myTable1').DataTable({
-        searching: false  // Disable search
-        // info: false  // Disable info
+
+    $('#lineChart2').sparkline([99,125,122,105,110,124,115], {
+        type: 'line',
+        height: '70',
+        width: '100%',
+        lineWidth: '2',
+        lineColor: '#f3545d',
+        fillColor: 'rgba(243, 84, 93, .14)'
     });
-});
-</script>
-<script>
-$(document).ready(function(){
-    $(".generate").click(function(){
-        $(".thisRow1").hide();
-        $(".thisRow2").hide();
-        $(".thisRow3").show();
-        $(".print").show();
-        print();
-        location.reload();
+
+    $('#lineChart3').sparkline([105,103,123,100,95,105,115], {
+        type: 'line',
+        height: '70',
+        width: '100%',
+        lineWidth: '2',
+        lineColor: '#ffa534',
+        fillColor: 'rgba(255, 165, 52, .14)'
     });
-});
 </script>

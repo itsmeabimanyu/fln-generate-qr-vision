@@ -1,0 +1,126 @@
+{% extends 'layouts/base.html' %}
+{% load static custom_filters %}
+<!-- [ Main Content ] start -->
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card ">
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <h4 class="card-title">{{ card_title }}</h4>
+                        <div class="ms-auto">
+                            <div class="input-group">
+                                s{{ additionals_button|safe }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="p-3">{{ form.as_p }}</div>
+                </div>
+                <div class="card-action py-4 px-4">
+                    <button type="submit" class="btn btn-secondary">Submit</button>
+                    <button type="button" class="btn btn-dark" onclick="window.history.back();">Back</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-stats card-round">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h4 class="card-title">List View</h4>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="datatablesSimple" class="table table-sm table-hover">
+                        <thead>
+                            <tr class="table-secondary">
+                                <th class="mw-25">No.</th>
+                                {% for key, value in fields.items %}
+                                    <th>{{ value }}</th>
+                                {% endfor %}
+                                <th style="width:10%">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td class="clickable table-secondary" role="button">{{ forloop.counter }}</td>
+                                {% for field in fields %}
+                                    <td>{{ item|get_field_value:field|safe }}</td>
+                                {% endfor %}
+                                <td>{% for button in item.buttons_action %}{{ button|safe }}{% endfor %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block modal %}
+    {% include 'includes/modal.html' %}
+{% endblock modal %}
+
+<script>
+    $(document).ready(function() {
+        // Menyembunyikan kolom ketiga hingga sebelum kolom terakhir
+        var table = $('#datatablesSimple').DataTable();
+        var totalColumns = table.columns().count();
+
+        // Menyembunyikan kolom dari kolom ke-2 hingga sebelum kolom terakhir
+        table.columns().every(function (index) {
+            if (index >= 6 && index < totalColumns - 1) {
+                this.visible(false); // Menyembunyikan kolom
+            }
+        });
+        
+        // Ketika baris yang dapat diklik diklik
+        // Menambahkan event listener pada sel dengan kelas 'clickable' untuk ekspansi baris
+        $('#datatablesSimple tbody').on('click', 'td.clickable', function() {
+            var row = table.row($(this).closest('tr')); // Mendapatkan baris yang terkait dengan sel yang diklik
+
+            // Jika baris tersebut sudah diperluas
+            if (row.child.isShown()) {
+                // Menutup baris yang diperluas
+                row.child.hide();
+                $(this).closest('tr').removeClass('shown');
+            } else {
+                // Menampilkan baris yang diperluas dengan informasi tambahan
+                var rowData = row.data();  // Mendapatkan data baris yang diklik
+                var columnHeaders = table.columns().header(); // Mendapatkan header kolom
+                var expandedData = '<table class="table table-hover">';
+
+                // Menambahkan data untuk setiap kolom
+                for (var i = 0; i < totalColumns; i++) {
+                    if (i >= 1 && i < totalColumns - 1) {  // Menampilkan kolom yang disembunyikan
+                        expandedData += '<tr>';
+                        expandedData += '<td class="w-25 table-secondary"><strong>' + $(columnHeaders[i]).text() + '</strong></td>';
+                        expandedData += '<td>' + rowData[i] + '</td>';
+                        expandedData += '</tr>';
+                    }
+                }
+
+                expandedData += '</table>';
+
+                // Menampilkan data pada baris yang diperluas
+                row.child(expandedData).show();
+                $(this).closest('tr').addClass('shown');
+            }
+        });
+
+    });
+</script>
+
+{% endblock content %}
