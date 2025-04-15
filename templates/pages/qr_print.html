@@ -1,0 +1,16 @@
+{% load static %}
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>Generate QR Vision</title>
+<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+<link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon"/>
+<!-- CSS Files -->
+<link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/kaiadmin.css' %}">
+
+{% for item in qr_data %}
+<figure class="figure">
+  <img src="data:image/png;base64,{{ item.qr_base64 }}" alt="QR Code" width="128" height="128">
+  <figcaption class="figure-caption text-center">{{ item.invoice }}</figcaption>
+</figure>
+{% endfor %}

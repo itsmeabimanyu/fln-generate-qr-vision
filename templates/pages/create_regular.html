@@ -58,7 +58,14 @@
                                 {% for field in fields %}
                                     <td>{{ item|get_field_value:field|safe }}</td>
                                 {% endfor %}
-                                <td>{% for button in item.buttons_action %}{{ button|safe }}{% endfor %}</td>
+                                <td>
+                                    <button type="button" class="btn w-100 btn-warning dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#act-{{ item.id }}">Options </button>
+                                    <div id="act-{{ item.id }}" class="collapse mt-1">
+                                        {% for value in item.buttons_action %}
+                                            {{ value|safe  }}
+                                        {% endfor %}
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

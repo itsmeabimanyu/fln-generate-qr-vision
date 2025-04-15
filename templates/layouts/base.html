@@ -4,11 +4,11 @@
     <head>
         {% include 'includes/head.html' %}
         {% block extrastyle %}
-                   <style>
-                    table {
-                        border-spacing: 0; /* Menghilangkan jarak antar kolom dan baris */
-                    }
-                   </style>
+        <style>
+        table {
+            border-spacing: 0; /* Menghilangkan jarak antar kolom dan baris */
+        }
+        </style>
         {% endblock extrastyle %}
         {% block extrahead %}
         {% endblock extrahead %}
@@ -85,20 +85,13 @@
     
                 // Add Row
                 $('#add-row').DataTable({
-                    "pageLength": 5,
-                });
-    
-                var action = '<td> <div class="form-button-action"> <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task"> <i class="fa fa-edit"></i> </button> <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-danger" data-original-title="Remove"> <i class="fa fa-times"></i> </button> </div> </td>';
-    
-                $('#addRowButton').click(function() {
-                    $('#add-row').dataTable().fnAddData([
-                        $("#addName").val(),
-                        $("#addPosition").val(),
-                        $("#addOffice").val(),
-                        action
-                        ]);
-                    $('#addRowModal').modal('hide');
-    
+                    columnDefs: [
+                        {
+                            targets: 0,        // Disable sorting for column 0
+                            orderable: false   // Make the column unsortable
+                        }
+                    ],
+                    order: [[1, 'asc']]
                 });
             });
         </script>

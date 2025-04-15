@@ -14,7 +14,7 @@
                         <div class="ms-auto">
                             <div class="input-group">
                                 <input type="number" id="rowCount" class="form-control" min="1">
-                                <button class="btn btn-sm btn-secondary" type="button" id="addRows"><i class="fa fa-plus me-2"></i>Add Rows</button>
+                                <button class="btn btn-secondary" type="button" id="addRows"><i class="fa fa-plus me-2"></i>Add Rows</button>
                                 {{ additionals_button|safe }}
                             </div>
                         </div>
@@ -25,6 +25,7 @@
                         <table id="add-row" class="table table-sm table-hover" >
                             <thead>
                                 <tr>
+                                    <th><input type="checkbox" id="check-all" {% if not items %}disabled{% endif %}></th>
                                     <th>#</th>
                                     {% for field in form %}
                                         <th>{{ field.label }}</th>
@@ -36,15 +37,16 @@
                                 <!-- ListView -->
                                 {% for item in items %}
                                 <tr>
-                                    <td class="clickable">{{ forloop.counter }}</td>
+                                    <td><input type="checkbox" class="select" name="select" value="{{ item.id }}"></td>
+                                    <td class="clickable table-secondary">{{ forloop.counter }}</td>
                                     {% for field in form %}
                                     <td>{{ item|get_field_value:field.name|safe }}</td>
                                     {% endfor %}
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#act-{{ item.id }}">Options </button>
+                                        <button type="button" class="btn w-100 btn-warning dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#act-{{ item.id }}">Options </button>
                                         <div id="act-{{ item.id }}" class="collapse mt-1">
                                             {% for value in item.buttons_action %}
-                                                {{ value|safe }}
+                                                {{ value|safe  }}
                                             {% endfor %}
                                         </div>
                                     </td>
@@ -54,26 +56,40 @@
 
                                 <!-- Form -->
                                 <tr>
+                                    <td></td>
                                     <td>{{ items|length|add:1 }}</td>
                                     {% for field in form %}
                                         <td>{{ field }}</td>
                                     {% endfor %}
-                                    <td><button type="button" class="btn btn-danger btn-sm deleteRow"><i class="fa fa-trash"></i></button></td> 
+                                    <td><button type="button" class="btn btn-danger deleteRow"><i class="fa fa-times"></i></button></td> 
                                 </tr>
                                 <!-- End Form -->
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <div class="card-action py-4 px-4">
-                    <button type="submit" class="btn btn-secondary">Submit</button>
-                    <button type="button" class="btn btn-dark" onclick="window.history.back();">Back</button>
+                <div class="card-action py-4 px-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="submit" name="action" value="save" class="btn btn-secondary">Submit</button>
+                        <button type="button" class="btn btn-dark" onclick="window.history.back();">Back</button>
+                    </div>
+                    <div>
+                        {{ buttons_action|safe }}
+                    </div>
                 </div>
+                {% block extramodal %}
+                    {% include 'includes/extra_modal.html' %}
+                {% endblock extramodal %}
             </form>
         </div>
     </div>
 </div>
 
+{% block modal %}
+    {% include 'includes/modal.html' %}
+{% endblock modal %}
+
+<!-- tambah row -->
 <script>
     $(document).ready(function() {
         // Tambahkan baris saat tombol "Add Rows" diklik
@@ -97,13 +113,14 @@
                 // Buat baris baru
                 var newRow = `
                     <tr>
+                        <td></td>
                         <td>${currentRowCount}</td>
                         {% for field in form %}
                             <td>{{ field }}</td>
                         {% endfor %}
                         <td>
-                            <button type="button" class="btn btn-danger btn-sm deleteRow">
-                                <i class="fa fa-trash"></i>
+                            <button type="button" class="btn btn-danger deleteRow">
+                                <i class="fa fa-times"></i>
                             </button>
                         </td>
                     </tr>
@@ -120,7 +137,7 @@
 
             // Perbarui nomor baris setelah menghapus
             $('#add-row tbody tr').each(function(index) {
-                $(this).find('td:first').text(index + 1);
+                $(this).find('td:nth-child(2)').text(index + 1);  // Update the second column (index 1) with the new row number
             });
         });
         // Ketika baris yang dapat diklik diklik
@@ -136,13 +153,13 @@
             } else {
                 // Jika baris anak belum ada, buat dan tampilkan
                 var childContent = '<tr class="child-row"><td colspan="5">';
-                childContent += '<table class="table table-sm table-secondary">';
+                childContent += '<table class="table table-sm table-hover">';
                 // Ambil data dari kolom yang disembunyikan
                 tr.find('td').each(function(index) {
                     if (index > 0 && index < tr.find('td').length - 1) {
                         var columnName = $('#add-row th').eq(index).text();
                         var columnValue = $(this).text();
-                        childContent += '<tr><td class="w-25"><strong>' + columnName + '</strong></td><td>' + columnValue + '</td></tr>';
+                        childContent += '<tr><td class="table-secondary"><strong>' + columnName + '</strong></td><td>' + columnValue + '</td></tr>';
                     }
                 });
                 childContent += '</table></td></tr>';
@@ -152,6 +169,7 @@
     });
 </script>
 
+<!-- format ammounts -->
 <script>
     // Fungsi untuk menambahkan koma dan memformat angka dengan desimal (cent)
     function formatNumberWithCommas(input) {
@@ -174,13 +192,15 @@
         }
     }
     // Menambahkan fungsi pada semua input dengan kelas "number-with-commas"
-    document.querySelectorAll('.number-with-commas').forEach(function(input) {
-        input.addEventListener('input', function() {
-            formatNumberWithCommas(input);
-        });
+    // Event delegation untuk elemen yang mungkin ditambahkan secara dinamis
+    document.addEventListener('input', function(event) {
+        if (event.target.classList.contains('number-with-commas')) {
+            formatNumberWithCommas(event.target);
+        }
     });
 </script>
 
+<!-- Gabungkan input kedalam plain text -->
 <script>
     $('#add-row tbody').on('change', 'input', function() {
         var row = $(this).closest('tr');
@@ -211,5 +231,71 @@
     });
 </script>
 
+<!-- Checkbox -->
+<script>
+    // Mendapatkan elemen checkbox "select semua" dan semua checkbox individual
+    const checkAll = document.getElementById('check-all');
+    const checkboxes = document.querySelectorAll('.select');
+
+    const printButton = document.getElementById('print-button');
+    const deleteButton = document.getElementById('delete-button');
+    const deleteModalButton = document.getElementById('delete-modal-button');
+
+    const form = document.querySelector('form');
+
+     // Fungsi untuk menghapus atribut required
+     function disableRequiredFields() {
+        form.querySelectorAll('[required]').forEach(function (input) {
+            input.removeAttribute('required');
+        });
+    }
+
+    // Hanya tombol tertentu yang disable required
+    printButton?.addEventListener('click', disableRequiredFields);
+    deleteModalButton?.addEventListener('click', disableRequiredFields);
+    
+    // Fungsi untuk memeriksa apakah ada checkbox yang dicentang
+    function toggleButtonVisibility() {
+        // Cek apakah ada checkbox yang dicentang, jika iya tampilkan tombol
+        const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked) || checkAll.checked;
+        if (!anyChecked) {
+            printButton.classList.add('disabled');
+            deleteButton.classList.add('disabled');
+        } else {
+            printButton.classList.remove('disabled');
+            deleteButton.classList.remove('disabled');
+        }
+    }
+
+    // Event listener untuk checkbox "select semua"
+    checkAll.addEventListener('change', function() {
+        // Setiap checkbox akan disesuaikan dengan status checkbox "select semua"
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = checkAll.checked;
+        });
+        // Cek dan perbarui status tombol
+        toggleButtonVisibility();
+    });
+
+    // Event listener untuk setiap checkbox individual
+    checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            // Jika ada checkbox yang tidak dicentang, hilangkan centang pada "select semua"
+            if (!this.checked) {
+                checkAll.checked = false;
+            } else {
+                // Cek apakah semua checkbox dicentang, jika iya centang "select semua"
+                checkAll.checked = Array.from(checkboxes).every(function(checkbox) {
+                    return checkbox.checked;
+                });
+            }
+            // Cek dan perbarui status tombol
+            toggleButtonVisibility();
+        });
+    });
+
+    // Panggil fungsi pertama kali untuk memastikan tombol tersembunyi saat awal
+    toggleButtonVisibility();
+</script>
 
 {% endblock content %}
