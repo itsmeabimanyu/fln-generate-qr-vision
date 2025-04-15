@@ -1,20 +1,15 @@
-from django.shortcuts import get_object_or_404, render, redirect
-from django.urls import reverse, reverse_lazy
-from django.views.generic import TemplateView, CreateView, View
-
 from django.conf import settings
-
-import os
-import fitz  # pip install pymupdf
-from Crypto.Cipher import AES  # pip install pycryptodome
-# from Crypto.Util.Padding import pad
-import base64
-import qrcode  # pip install qrcode
-from PIL import Image  # resize image # pip install pillow
-from .forms import InvoiceForm, PrivateKeyForm
-from .models import PrivateKey, Invoice
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, TemplateView, View
+
+import base64
 import io
+import qrcode  # pip install qrcode
+
+from .forms import InvoiceForm, PrivateKeyForm
+from .models import Invoice, PrivateKey
 
 class CreatePrivateKeyView(CreateView):
     template_name = 'pages/create_regular.html'

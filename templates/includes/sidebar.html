@@ -33,14 +33,14 @@
                     <h4 class="text-section">Main Menu</h4>
                 </li>
                 
-                <li class="nav-item active">
+                <li class="nav-item {% if request.path|startswith:'/qrvision/' %}active{% endif %}">
                     <a data-bs-toggle="collapse" href="#sidebarLayouts">
                         <i class="fas fa-qrcode"></i>
                         <p>QR Vision</p>
                         <span class="caret"></span>
                     </a>
                     <div class="collapse" id="sidebarLayouts">
-                        <ul class="nav nav-collapse">
+                        <ul class="nav nav-collapse {% if request.path|startswith:'/qrvision/' %}active{% endif %}">
                             <li>
                                 <a href="{% url 'invoice_create_manual' %}">
                                     <span class="sub-item">Manual Input</span>
@@ -50,22 +50,6 @@
                     </div>
                 </li>
 
-                <li class="nav-item">
-                    <a data-bs-toggle="collapse" href="#sidebarLayouts">
-                        <i class="fas fa-qrcode"></i>
-                        <p>QR Vision</p>
-                        <span class="caret"></span>
-                    </a>
-                    <div class="collapse" id="sidebarLayouts">
-                        <ul class="nav nav-collapse">
-                            <li>
-                                <a href="{% url 'invoice_create_manual' %}">
-                                    <span class="sub-item">Manual Input</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
             </ul>
         </div>
     </div>
