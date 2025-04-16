@@ -130,7 +130,7 @@ class RegisterAccount(CreateView):
         return super().form_invalid(form)
     
 # Chapter Register for development
-"""class RegisterView(CreateView):
+""" class RegisterView(CreateView):
     form_class = RegisterForm  # Form yang digunakan
     template_name = 'layouts/base_login.html'  # Template untuk form registrasi
     success_url = reverse_lazy('event_dashboard')  # URL tujuan setelah registrasi berhasil
@@ -181,6 +181,8 @@ class AccountListView(SuperuserRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['title'] = 'Generate QR Vision'
+        context['sub_title'] = 'Accounts'
         context['fields'] = {
             'username': 'Username',
             'email': 'Email',
@@ -253,7 +255,9 @@ class CreatePrivateKeyView(BaseRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['card_title'] = 'Create Private Key'
+        context['title'] = 'Generate QR Vision'
+        context['sub_title'] = 'QR Vision Private Key'
+        context['card_title'] = 'Add Private Key'
         items =  PrivateKey.objects.all()
         
         # Tambah tombol ke tiap baris data
@@ -308,7 +312,9 @@ class CreateManualInvoiceView(BaseRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['card_title'] = 'Manual Input Invoice'
+        context['title'] = 'Generate QR Vision'
+        context['sub_title'] = 'Manual Input Invoice'
+        context['card_title'] = 'Invoice Actions'
 
         context['buttons_action'] = f"""
             <button type="submit" name="action" value="print" class="btn btn-secondary" id="print-button"><i class="fas fa-print me-2 "></i>Print</button>
