@@ -3,6 +3,7 @@
 <!-- [ Main Content ] start -->
 {% block content %}
 
+{% if card_title %}
 <div class="row">
     <div class="col-md-12">
         <div class="card ">
@@ -13,7 +14,7 @@
                         <h4 class="card-title">{{ card_title }}</h4>
                         <div class="ms-auto">
                             <div class="input-group">
-                                s{{ additionals_button|safe }}
+                                {{ additionals_button|safe }}
                             </div>
                         </div>
                     </div>
@@ -29,7 +30,9 @@
         </div>
     </div>
 </div>
+{% endif %}
 
+{% if items %}
 <div class="row">
     <div class="col-md-12">
         <div class="card card-stats card-round">
@@ -75,6 +78,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 {% block modal %}
     {% include 'includes/modal.html' %}

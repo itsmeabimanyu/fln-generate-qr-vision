@@ -5,7 +5,7 @@
         <!-- Logo Header -->
         <div class="logo-header bg-secondary">
 
-            <a href="index.html" class="logo">
+            <a href="/" class="logo">
                 <img src="{% static 'images/logo.png' %}" alt="navbar brand" class="navbar-brand" height="50">
             </a>
             <div class="nav-toggle">
@@ -34,14 +34,14 @@
                 </li>
                 
                 <li class="nav-item {% if request.path|startswith:'/qrvision/' %}active{% endif %}">
-                    <a data-bs-toggle="collapse" href="#sidebarLayouts">
+                    <a data-bs-toggle="collapse" href="#sidebarMainMenu">
                         <i class="fas fa-qrcode"></i>
                         <p>QR Vision</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse" id="sidebarLayouts">
-                        <ul class="nav nav-collapse {% if request.path|startswith:'/qrvision/' %}active{% endif %}">
-                            <li>
+                    <div class="collapse {% if request.path|startswith:'/qrvision/invoice/' %}show{% endif %}" id="sidebarMainMenu">
+                        <ul class="nav nav-collapse">
+                            <li class="{% if request.path|startswith:'/qrvision/invoice/' %}active{% endif %}">
                                 <a href="{% url 'invoice_create_manual' %}">
                                     <span class="sub-item">Manual Input</span>
                                 </a>
@@ -49,6 +49,22 @@
                         </ul>
                     </div>
                 </li>
+                
+                {% if user.is_superuser %}
+                <li class="nav-section">
+                    <span class="sidebar-mini-icon">
+                        <i class="fa fa-ellipsis-h"></i>
+                    </span>
+                    <h4 class="text-section">Master Data</h4>
+                </li>
+
+                <li class="nav-item {% if request.path|startswith:'/account/' %}active{% endif %}">
+                    <a href="{% url 'account_list' %}">
+                        <i class="fas fa-users"></i>
+                        <p>Accounts</p>
+                    </a>
+                </li>
+                {% endif %}
 
             </ul>
         </div>

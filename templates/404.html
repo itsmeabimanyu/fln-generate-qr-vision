@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Management System</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'DMSApp/images/favicon.webp' %}" />
+    <link rel="stylesheet" href="{% static 'DMSApp/css/adminlte.css' %}">
+    <link rel="stylesheet" href="{% static 'DMSApp/css/fonts.css' %}">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <div class="error-content">
+            <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page not found.</h3>
+            <p>
+                We couldn't find the page you are looking for. Meanwhile, you can return to the <a href="/">main page</a>.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -17,19 +17,16 @@
         {% block pre_loader %}
             {% include 'includes/preloader.html' %}
         {% endblock pre_loader %}
-
         <div class="wrapper">
             {% block sidebar %}
                 {% include 'includes/sidebar.html' %}
             {% endblock sidebar %}
             <div class="main-panel">
-
                 <!-- [ header ] start -->
                 {% block header %}
                     {% include 'includes/navbar.html' %}
                 {% endblock header %}
                 <!-- [ header ] end -->
-          
                 <div class="container">
                     <div class="page-inner">
                         {% if messages %}
@@ -40,11 +37,9 @@
                             </div>
                             {% endfor %}
                         {% endif %}
-                        
                     {% block content %}{% endblock content %}
                     </div>
                 </div>
-      
                 <!-- [ footer ] start -->
                 {% block footer %}
                     {% include 'includes/footer.html' %}
@@ -56,33 +51,6 @@
         {% block extra_js %}
         <script >
             $(document).ready(function() {
-                $('#basic-datatables').DataTable({
-                });
-    
-                $('#multi-filter-select').DataTable( {
-                    "pageLength": 5,
-                    initComplete: function () {
-                        this.api().columns().every( function () {
-                            var column = this;
-                            var select = $('<select class="form-select"><option value=""></option></select>')
-                            .appendTo( $(column.footer()).empty() )
-                            .on( 'change', function () {
-                                var val = $.fn.dataTable.util.escapeRegex(
-                                    $(this).val()
-                                    );
-    
-                                column
-                                .search( val ? '^'+val+'$' : '', true, false )
-                                .draw();
-                            } );
-    
-                            column.data().unique().sort().each( function ( d, j ) {
-                                select.append( '<option value="'+d+'">'+d+'</option>' )
-                            } );
-                        } );
-                    }
-                });
-    
                 // Add Row
                 $('#add-row').DataTable({
                     columnDefs: [

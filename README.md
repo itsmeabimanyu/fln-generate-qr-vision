@@ -2,4 +2,4 @@
 ## Demo
 https://www.youtube.com/watch?v=FA2nVvts8Fk
 
-pip install django pycryptodome qrcode
+pip install django pycryptodome qrcode django-auth-ldap

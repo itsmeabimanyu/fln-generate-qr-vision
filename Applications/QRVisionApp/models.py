@@ -3,12 +3,17 @@ from django.db import models
 from django.utils import timezone
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
+class CustomUserLogin(AbstractUser):
+    registered = models.BooleanField(default=False)
+
 class PrivateKey(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True )
     private_key = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(CustomUserLogin, on_delete=models.CASCADE, related_name='private_key')
 
     def __str__(self):
         return f"{self.private_key}"
@@ -23,6 +28,7 @@ class Invoice(models.Model):
     plain_text = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     cipher_text = models.CharField(max_length=255)
+    created_by = models.ForeignKey(CustomUserLogin, on_delete=models.CASCADE, related_name='invoice')
 
     def save(self, *args, **kwargs):
         key = self.private_key.private_key  # secret key

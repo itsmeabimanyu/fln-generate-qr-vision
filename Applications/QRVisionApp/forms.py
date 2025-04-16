@@ -1,5 +1,38 @@
 from django import forms
-from .models import PrivateKey, Invoice
+from .models import PrivateKey, Invoice, CustomUserLogin
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+
+class CustomLoginForm(AuthenticationForm):
+    username = forms.CharField(
+        label='Username',
+        widget=forms.TextInput(attrs={'class': 'form-control mt-2 mb-2', 'placeholder': 'Enter your username'})
+    )
+
+class RegisterAccountForm(UserCreationForm):
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control mt-2 mb-2'}),
+        label='Password',
+        help_text='Enter a secure password.'
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control mt-2 mb-2'}),
+        label='Confirm Password',
+        help_text='Re-enter your password for confirmation.'
+    )
+    class Meta:
+        model = CustomUserLogin
+        fields = [
+            'username',
+            'email',
+            'password1',
+            'password2',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control mt-2 mb-3'})
+            field.widget.attrs.update({'autocomplete': 'off'})
 
 class PrivateKeyForm(forms.ModelForm):
     class Meta:
@@ -37,7 +70,7 @@ class InvoiceForm(forms.ModelForm):
                 field.widget.attrs.update({'class': 'form-control number-with-commas mt-2 mb-2'})
 
             if field_name == 'private_key':
-                field.widget.attrs.update({'class': 'form-control form-select mt-2 mb-2'})
+                field.widget.attrs.update({'class': 'form-control form-select mt-2 mb-2', 'required': 'required'})
 
             if field_name == 'plain_text':
                 field.widget.attrs.update({'readonly': 'readonly', 'style' : 'background: transparent !important; border: transparent;'})

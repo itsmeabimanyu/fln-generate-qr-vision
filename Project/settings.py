@@ -10,7 +10,52 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+import ldap
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 from pathlib import Path
+
+AUTH_LDAP_SERVER_URI = "ldap://10.35.1.8:389"
+AUTH_LDAP_BIND_DN = "ldap"
+AUTH_LDAP_BIND_PASSWORD = "ldapp2p"
+
+# User search configuration
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    "ou=Departments,dc=fln,dc=local",
+    ldap.SCOPE_SUBTREE,
+    "(sAMAccountName=%(user)s)"  # Filter for sAMAccountName
+)
+
+# Connection options
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_REFERRALS: 0,
+    ldap.OPT_NETWORK_TIMEOUT: 5  # Timeout in seconds
+}
+
+# User attribute mapping
+AUTH_LDAP_USER_ATTR_MAP = {
+    "username": "sAMAccountName",  # Map sAMAccountName to username
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail",
+    # "distinguishedName" : "distinguishedName" # baris ini ditambahkan karena sudah menggunakan model Custom User
+}
+
+# Debugging (optional)
+import logging
+logger = logging.getLogger('django_auth_ldap')
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
+
+# Django authentication backends
+AUTHENTICATION_BACKENDS = [
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# URL settings
+LOGIN_URL = '/login/'  # Set your login URL
+LOGIN_REDIRECT_URL = '/'  # Redirect URL after login
+LOGOUT_REDIRECT_URL = '/' # Redirect to the homepage or another appropriate URL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,10 +68,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-g4hbrs34@4d^u(s!+y+%*nld!c0ji-as&k-7ki&+6b=8nzi#u5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -129,3 +173,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Update settings.py to Use Custom User Model
+AUTH_USER_MODEL = 'QRVisionApp.CustomUserLogin'
