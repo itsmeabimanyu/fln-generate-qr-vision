@@ -195,22 +195,22 @@ class AccountListView(SuperuserRequiredMixin, ListView):
             item.buttons_action = [
                 f"""
                 <button type="button" data-bs-toggle="modal" data-bs-target="#modal-first-{item.id}"
-                {'class="btn btn-danger mb-1 w-100"><i class="icon-logout me-2"></i>Unregister' if item.registered 
+                {'class="btn btn-danger mb-1 w-100"><i class="icon-logout me-2"></i>Disable' if item.registered 
                  else 'class="btn btn-primary mb-1 w-100"><i class="icon-login me-2"></i>Register'}</button>
                 """, 
                 f"""
                 <button type="button" data-bs-toggle="modal" data-bs-target="#modal-second-{item.id}" {'' if item.registered else 'disabled'}
-                {'class="btn btn-danger w-100"><i class="fa fa-user-alt-slash mb-1 me-2"></i>Revoke Superuser' if item.is_superuser 
+                {'class="btn btn-danger w-100"><i class="fa fa-user-alt-slash mb-1 me-2"></i>Revoke' if item.is_superuser 
                  else 'class="btn btn-primary w-100"><i class="fas fa-user-cog mb-1 me-2"></i>Make Superuser'}</button>
                 """
             ]
 
             # Content modal
             item.modals_form = {
-                'Unregister Account' if item.registered else 'Register Account': {
+                'Disable Account' if item.registered else 'Register Account': {
                     'modal_id': f'modal-first-{item.id}',
                     'action_url': reverse('account_mark_register', kwargs={'pk': item.id}),
-                    'action_button': f'<button type="submit" class="btn btn-danger">Unregister</button>' if item.registered else '<button type="submit" class="btn btn-primary">Register</button>',
+                    'action_button': f'<button type="submit" class="btn btn-danger">Disable</button>' if item.registered else '<button type="submit" class="btn btn-primary">Register</button>',
                     'info': f'<p class="fw-bolder text-secondary">{item}</p>'
                 },
                 'Unset as Superuser' if item.is_superuser else 'Set as Superuser': {
